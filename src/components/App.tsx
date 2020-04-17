@@ -1,25 +1,19 @@
 import React, { useState } from "react"
 import "../styles/App.css"
 
-let suggested = ["white", "blue", "black", "red", "purple", "yellow", "orange"]
-
 function App() {
-  const [suggest, setSuggest] = useState("")
+  const [suggest, setSuggest] = useState<string>("")
+  const [result, setResult] = useState<any[]>([])
 
-  const autoComplete = () => {
-    let suggestions = suggested.filter((word) => word.includes(suggest))
+  const getResults = () => {
+    // let search = "https://www.googleapis.com/books/v1/volumes?q=" + suggest
 
-    return suggestions
-  }
+    fetch("https://www.googleapis.com/books/v1/volumes?q=harry+potter")
+      .then((res) => res.json())
+      .then((res) => setResult(res.items))
+      .catch((err) => console.log(err.message))
 
-  const submitVal = () => {
-    console.log("Suggestions: ")
-
-    let words = autoComplete()
-
-    words.map((word) => {
-      console.log(word)
-    })
+    console.log(result)
   }
 
   return (
@@ -31,14 +25,18 @@ function App() {
         placeholder="book title"
         onChange={(e) => setSuggest(e.target.value)}
       />
-      <button onClick={submitVal}>Search</button>
+      <button onClick={getResults}>Search</button>
+
+      <div className="search-results">
+        {result &&
+          result.map((item, i) => {
+            let book = item.volumeInfo
+
+            return <li>{book.title}</li>
+          })}
+      </div>
     </div>
   )
 }
-
-// MAKE AUTOCOMPLETE FOR THE FORM
-// Get a list of suggested words
-// Compare the words to the typed in text in the input
-// Dispaly the array of suggested words that match the currently typed in text
 
 export default App
